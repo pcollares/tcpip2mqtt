@@ -1,5 +1,7 @@
 package tcpip2mqtt;
 
+import tcpip2mqtt.roteador.Roteador;
+import tcpip2mqtt.mqtt.ClienteMQTT;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -8,7 +10,13 @@ import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import tcpip2mqtt.conexao.Conexao.Protocolo;
 
+/**
+ * https://github.com/pcollares/tcpip2mqtt
+ *
+ * @author Paulo Collares
+ */
 public class Main {
 
     private static final String PROPERTIES = "config.properties";
@@ -35,12 +43,13 @@ public class Main {
 
             for (String conexao : c) {
                 String cc[] = conexao.split(",");
-                int porta = Integer.parseInt(cc[0]);
-                String topico = cc[1];
-                int qos = Integer.parseInt(cc[2]);
-                int tamanho = Integer.parseInt(cc[3]);
+                Protocolo protocolo = Protocolo.valueOf(cc[0]);
+                int porta = Integer.parseInt(cc[1]);
+                String topico = cc[2];
+                int qos = Integer.parseInt(cc[3]);
+                int tamanho = Integer.parseInt(cc[4]);
 
-                roteadores.add(new Roteador(porta, topico, qos, tamanho));
+                roteadores.add(new Roteador(protocolo, porta, topico, qos, tamanho));
             }
         } catch (Exception e) {
             Logger.getLogger(ClienteMQTT.class.getName()).log(Level.SEVERE, null, e);

@@ -1,4 +1,4 @@
-package tcpip2mqtt;
+package tcpip2mqtt.mqtt;
 
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
@@ -10,7 +10,13 @@ import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MqttDefaultFilePersistence;
+import tcpip2mqtt.Main;
 
+/**
+ * https://github.com/pcollares/tcpip2mqtt
+ *
+ * @author Paulo Collares
+ */
 public class ClienteMQTT implements MqttCallback {
 
     private static ClienteMQTT instancia;

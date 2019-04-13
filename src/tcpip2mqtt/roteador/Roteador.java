@@ -1,18 +1,28 @@
-package tcpip2mqtt;
+package tcpip2mqtt.roteador;
 
+import tcpip2mqtt.interfaces.Ouvinte;
+import tcpip2mqtt.mqtt.ClienteMQTT;
+import tcpip2mqtt.conexao.Conexao;
+import tcpip2mqtt.conexao.Conexao.Protocolo;
+
+/**
+ * https://github.com/pcollares/tcpip2mqtt
+ *
+ * @author Paulo Collares
+ */
 public class Roteador implements Ouvinte {
 
     private final int qos;
     private final Conexao conexao;
     private final String topico;
 
-    public Roteador(int porta, String topico, int qos, int tamanoPacote) {
+    public Roteador(Protocolo protocolo, int porta, String topico, int qos, int tamanoPacote) {
         this.topico = topico;
         this.qos = qos;
-        conexao = new Conexao(porta, this, tamanoPacote);
+        conexao = new Conexao(protocolo, porta, this, tamanoPacote);
     }
-    
-    public void iniciar(){
+
+    public void iniciar() {
         conexao.iniciar();
     }
 
