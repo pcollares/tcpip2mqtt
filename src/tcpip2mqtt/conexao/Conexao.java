@@ -29,7 +29,7 @@ public class Conexao {
     public void iniciar() {
         switch (protocolo) {
             case TCP:
-                new Thread(new ReceptorTCP(porta, ouvinte)).start();
+                new Thread(new ReceptorTCP(porta, tamanhoPacote, ouvinte)).start();
                 break;
             case UDP:
                 new Thread(new ReceptorUDP(porta, tamanhoPacote, ouvinte)).start();

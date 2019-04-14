@@ -16,13 +16,15 @@ import tcpip2mqtt.interfaces.Ouvinte;
 public class ReceptorTCP implements Runnable {
 
     private final int porta;
+    private final int tamanhoPacote;
 
     private Ouvinte ouvinte;
     private ServerSocket servidorTCP;
 
-    public ReceptorTCP(int porta, Ouvinte ouvinte) {
+    public ReceptorTCP(int porta, int tamanhoPacote, Ouvinte ouvinte) {
         this.porta = porta;
         this.ouvinte = ouvinte;
+        this.tamanhoPacote = tamanhoPacote;
     }
 
     @Override
@@ -37,29 +39,58 @@ public class ReceptorTCP implements Runnable {
                     Socket socketCliente = servidorTCP.accept();
                     socketCliente.setKeepAlive(true);
                     socketCliente.setSoTimeout(0);
-                    InputStream in = socketCliente.getInputStream();
-                    try {
-                        byte[] dadosReceber = new byte[in.available()];
 
-                        in.read(dadosReceber);
-                        ouvinte.notificar(dadosReceber);
-
-                    } catch (IOException e) {
-                        Logger.getLogger(Conexao.class.getName()).log(Level.SEVERE, null, e);
-                    } finally {
-                        try {
-                            in.close();
-                            socketCliente.close();
-                        } catch (IOException ioe) {
-                            Logger.getLogger(Conexao.class.getName()).log(Level.SEVERE, null, ioe);
-                        }
-                    }
+                    new Thread(new Conn(socketCliente)).start();
 
                 }
             } catch (IOException ex) {
                 Logger.getLogger(Conexao.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
+    }
+
+    private class Conn implements Runnable {
+
+        private Socket socketCliente;
+        private InputStream in;
+
+        public Conn(Socket socketCliente) throws IOException {
+            try {
+                this.socketCliente = socketCliente;
+                in = socketCliente.getInputStream();
+
+            } catch (IOException e) {
+                in.close();
+                Logger.getLogger(Conexao.class.getName()).log(Level.SEVERE, null, e);
+            }
+        }
+
+        @Override
+        public void run() {
+            while (!socketCliente.isClosed()) {
+                try {
+                    byte[] dadosReceber = new byte[tamanhoPacote];
+
+                    in.read(dadosReceber);
+               
+                    ouvinte.notificar(dadosReceber);
+
+                } catch (IOException e) {
+                    Logger.getLogger(Conexao.class.getName()).log(Level.SEVERE, null, e);
+                    try {
+
+                        in.close();
+                        socketCliente.close();
+                        socketCliente = null;
+                        return;
+                    } catch (IOException ioe) {
+                        Logger.getLogger(Conexao.class.getName()).log(Level.SEVERE, null, ioe);
+                    }
+
+                }
+            }
+        }
+
     }
 
 }
