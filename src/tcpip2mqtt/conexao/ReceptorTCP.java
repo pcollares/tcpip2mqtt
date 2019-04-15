@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import tcpip2mqtt.interfaces.Ouvinte;
@@ -72,8 +74,17 @@ public class ReceptorTCP implements Runnable {
                     byte[] dadosReceber = new byte[tamanhoPacote];
 
                     in.read(dadosReceber);
-               
-                    ouvinte.notificar(dadosReceber);
+
+                    boolean vazio = true;
+                    for (int i = 0; i < dadosReceber.length; i++) {
+                        if (dadosReceber[i] != 0) {
+                            vazio = false;
+                            break;
+                        }
+                    }
+                    if (!vazio) {
+                        ouvinte.notificar(dadosReceber);
+                    }
 
                 } catch (IOException e) {
                     Logger.getLogger(Conexao.class.getName()).log(Level.SEVERE, null, e);
